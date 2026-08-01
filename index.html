@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PreciousT Collection — The Wardrobe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#181310;
+    --card:#211A16;
+    --cream:#F3ECE2;
+    --rose:#B98F73;
+    --rose-light:#D8B79A;
+    --wine:#5E2233;
+    --line:rgba(243,236,226,0.14);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background:var(--ink);
+    color:var(--cream);
+    font-family:'Jost',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.serif{font-family:'Cormorant Garamond',serif;}
+
+  /* HERO */
+  .hero{
+    padding:72px 24px 40px;
+    text-align:center;
+    border-bottom:1px solid var(--line);
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";
+    position:absolute; inset:0;
+    background:radial-gradient(ellipse at 50% 0%, rgba(185,143,115,0.16), transparent 60%);
+    pointer-events:none;
+  }
+  .eyebrow{
+    letter-spacing:0.35em;
+    font-size:11px;
+    text-transform:uppercase;
+    color:var(--rose-light);
+    margin-bottom:18px;
+  }
+  .hero h1{
+    font-size:clamp(40px,7vw,72px);
+    font-weight:500;
+    letter-spacing:0.01em;
+    line-height:1.05;
+  }
+  .hero p{
+    max-width:480px;
+    margin:18px auto 0;
+    color:rgba(243,236,226,0.65);
+    font-size:15px;
+    font-weight:300;
+    line-height:1.6;
+  }
+
+  /* FILTER BAR */
+  .filters{
+    position:sticky; top:0; z-index:20;
+    background:rgba(24,19,16,0.92);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+    padding:16px 24px;
+    display:flex; gap:12px; flex-wrap:wrap;
+    align-items:center;
+    justify-content:center;
+  }
+  .filters input, .filters select{
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--cream);
+    padding:9px 14px;
+    border-radius:2px;
+    font-family:'Jost',sans-serif;
+    font-size:13px;
+    font-weight:300;
+    outline:none;
+  }
+  .filters input{min-width:180px;}
+  .filters input::placeholder{color:rgba(243,236,226,0.4);}
+  .filters select{cursor:pointer;}
+  .filters option{background:var(--ink);}
+  .count{
+    font-size:12px;
+    letter-spacing:0.08em;
+    color:rgba(243,236,226,0.5);
+    text-transform:uppercase;
+    margin-left:auto;
+  }
+
+  /* GRID */
+  .grid{
+    max-width:1280px;
+    margin:0 auto;
+    padding:40px 24px 100px;
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+    gap:28px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    position:relative;
+    display:flex; flex-direction:column;
+    transition:transform .25s ease, border-color .25s ease;
+  }
+  .card:hover{ transform:translateY(-4px); border-color:var(--rose); }
+
+  .tag{
+    position:absolute; top:12px; left:0;
+    background:var(--wine);
+    color:var(--cream);
+    font-size:10px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    padding:5px 12px 5px 10px;
+    z-index:2;
+    clip-path:polygon(0 0,100% 0,88% 50%,100% 100%,0 100%);
+  }
+  .tag.unavailable{ background:#3a2f2a; color:rgba(243,236,226,0.55); }
+
+  .img-wrap{
+    aspect-ratio:3/4;
+    width:100%;
+    background:
+      linear-gradient(160deg, #2b221c, #17120f);
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+  }
+  .img-wrap img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .img-placeholder{
+    font-family:'Cormorant Garamond',serif;
+    font-style:italic;
+    color:rgba(243,236,226,0.25);
+    font-size:14px;
+    text-align:center;
+    padding:20px;
+  }
+
+  .info{ padding:18px 18px 20px; display:flex; flex-direction:column; gap:8px; flex:1; }
+  .info h3{ font-size:22px; font-weight:500; }
+  .meta{ font-size:12px; color:rgba(243,236,226,0.55); letter-spacing:0.03em; }
+  .sizes{ font-size:12px; color:var(--rose-light); margin-top:2px; }
+  .price{ font-size:15px; margin-top:6px; color:var(--cream); font-weight:400; }
+  .price span{ color:rgba(243,236,226,0.5); font-size:12px; }
+
+  .reserve{
+    margin-top:12px;
+    display:inline-block;
+    text-align:center;
+    background:transparent;
+    border:1px solid var(--rose);
+    color:var(--rose-light);
+    text-decoration:none;
+    padding:10px 0;
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    transition:background .2s ease,color .2s ease;
+  }
+  .reserve:hover{ background:var(--rose); color:var(--ink); }
+  .reserve.disabled{
+    border-color:rgba(243,236,226,0.2);
+    color:rgba(243,236,226,0.35);
+    pointer-events:none;
+  }
+
+  .empty{
+    text-align:center;
+    padding:80px 24px;
+    color:rgba(243,236,226,0.5);
+    font-family:'Cormorant Garamond',serif;
+    font-style:italic;
+    font-size:20px;
+  }
+
+  footer{
+    text-align:center;
+    padding:32px 24px 48px;
+    color:rgba(243,236,226,0.35);
+    font-size:11px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+  }
+
+  /* LOADING SCREEN */
+  #loader{
+    position:fixed; inset:0; z-index:100;
+    background:var(--ink);
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    gap:22px;
+    transition:opacity 0.6s ease, visibility 0.6s ease;
+  }
+  #loader.hidden{
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+  }
+  #loader::before{
+    content:"";
+    position:absolute; inset:0;
+    background:radial-gradient(ellipse at 50% 40%, rgba(185,143,115,0.14), transparent 65%);
+    pointer-events:none;
+  }
+  .loader-mark{
+    position:relative;
+    width:80px; height:80px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .loader-ring{ position:absolute; inset:0; border-radius:50%; border:1px solid var(--line); }
+  .loader-ring::before{
+    content:"";
+    position:absolute; inset:-1px;
+    border-radius:50%;
+    border:1px solid transparent;
+    border-top-color:var(--rose);
+    border-right-color:var(--rose-light);
+    animation:spin 1.4s linear infinite;
+  }
+  .loader-initial{
+    font-family:'Cormorant Garamond',serif;
+    font-style:italic;
+    font-size:28px;
+    color:var(--rose-light);
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .loader-word{
+    font-family:'Cormorant Garamond',serif;
+    font-size:24px;
+    letter-spacing:0.08em;
+    color:var(--cream);
+  }
+  .loader-sub{
+    font-size:10px;
+    letter-spacing:0.28em;
+    text-transform:uppercase;
+    color:rgba(243,236,226,0.4);
+    margin-top:-12px;
+  }
+  .loader-bar-track{
+    width:200px;
+    height:1px;
+    background:var(--line);
+    position:relative;
+    overflow:hidden;
+  }
+  .loader-bar-fill{
+    position:absolute; left:0; top:0; bottom:0;
+    width:0%;
+    background:var(--rose);
+    transition:width 0.25s ease;
+  }
+  .loader-status{
+    font-size:10px;
+    letter-spacing:0.15em;
+    text-transform:uppercase;
+    color:rgba(243,236,226,0.35);
+    min-height:14px;
+  }
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <div class="loader-mark">
+    <div class="loader-ring"></div>
+    <div class="loader-initial">P</div>
+  </div>
+  <div>
+    <div class="loader-word" style="text-align:center;">PreciousT Collection</div>
+    <div class="loader-sub" style="text-align:center;transform: translateY(20px);">The Wardrobe</div>
+  </div>
+  <div class="loader-bar-track"><div class="loader-bar-fill" id="loaderBarFill"></div></div>
+  <div class="loader-status" id="loaderStatus">Preparing your wardrobe…</div>
+</div>
+
+<div class="hero">
+  <div class="eyebrow">PreciousT Collection</div>
+  <h1>The Wardrobe</h1>
+  <p>Browse the current collection. Filter by occasion or size, then tap Reserve — your request goes straight to us on WhatsApp.</p>
+</div>
+
+<div class="filters">
+  <input id="search" type="text" placeholder="Search by name or colour…" oninput="render()">
+  <select id="categoryFilter" onchange="render()">
+    <option value="">All Categories</option>
+  </select>
+  <select id="sizeFilter" onchange="render()">
+    <option value="">All Sizes</option>
+  </select>
+  <span class="count" id="count"></span>
+</div>
+
+<div class="grid" id="grid"></div>
+<div class="empty" id="empty" style="display:none;">No dresses match those filters — try clearing a search.</div>
+
+<footer>PreciousT Collection · Rentals by request · Updated regularly</footer>
+<script>
+
+  
+
+
+/* ============================================================
+   CONFIG — edit these two lines
+   ============================================================ */
+const WHATSAPP_NUMBER = "27761971848"; // replace with PreciousT's WhatsApp number, country code no + or 0-prefix
+const BRAND_NAME = "PreciousT Collection";
+
+/* ============================================================
+   DRESSES — this is your catalogue data.
+   To add a new dress, copy one {...} block below and edit it.
+
+   Fields:
+   name      – dress name (from your naming list)
+   category  – e.g. "Evening Gown", "Cocktail", "Traditional", "Bridal"
+   colour    – main colour, shown under the name
+   sizes     – array of available sizes, e.g. ["S","M","L"]
+   price     – rental price as a number (no currency symbol)
+   available – true or false. If false, shows "Currently Out" and disables Reserve
+   image     – paste a direct image link here (see note below).
+               Leave as "" to show a placeholder until you add a photo.
+
+   HOW TO GET A DIRECT GOOGLE DRIVE IMAGE LINK:
+   1. Right-click the photo in Drive → Share → "Anyone with the link"
+   2. Copy the file ID from the share link (the long code between /d/ and /view)
+   3. Use this format: https://lh3.googleusercontent.com/d/FILE_ID
+   (Regular Drive share links won't display as images — this format will.)
+   ============================================================ */
+
+const dresses = [
+  {
+    name: "Rosé Cascade Gown",
+    category: "Premium",
+    colour: "Dusty Rose",
+    sizes: ["S","M","L"],
+    price: 1200,
+    available: true,
+    image: "https://drive.google.com/d/1_67o6V_FDlA92EjtyV0jzGlqP_yQJXsB"
+  },
+  {
+    name: "Champagne Whisper",
+    category: "Evening Gown",
+    colour: "Champagne",
+    sizes: ["M","L","XL"],
+    price: 1100,
+    available: true,
+    image: ""
+  },
+  {
+    name: "Sultry Fringe Mermaid",
+    category: "Evening Gown",
+    colour: "Black",
+    sizes: ["S","M"],
+    price: 1350,
+    available: false,
+    image: ""
+  },
+  {
+    name: "Emerald Line Dress",
+    category: "Cocktail",
+    colour: "Emerald Green",
+    sizes: ["S","M","L"],
+    price: 800,
+    available: true,
+    image: ""
+  },
+  {
+    name: "Ivory Draped Set",
+    category: "Bridal",
+    colour: "Ivory",
+    sizes: ["M","L"],
+    price: 1500,
+    available: true,
+    image: ""
+  },
+  {
+    name: "Midnight Satin Slip",
+    category: "Cocktail",
+    colour: "Navy",
+    sizes: ["S","M","L","XL"],
+    price: 750,
+    available: true,
+    image: ""
+  }
+];
+
+/* ============================================================
+   Below this line is the engine — no need to edit
+   ============================================================ */
+
+function populateFilters(){
+  const cats = [...new Set(dresses.map(d => d.category))].sort();
+  const sizes = [...new Set(dresses.flatMap(d => d.sizes))].sort();
+  const catSel = document.getElementById('categoryFilter');
+  const sizeSel = document.getElementById('sizeFilter');
+  cats.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c; o.textContent = c;
+    catSel.appendChild(o);
+  });
+  sizes.forEach(s => {
+    const o = document.createElement('option');
+    o.value = s; o.textContent = "Size " + s;
+    sizeSel.appendChild(o);
+  });
+}
+
+function waLink(dressName){
+  const msg = encodeURIComponent(`Hi! I'd love to reserve the "${dressName}" from ${BRAND_NAME}. Is it available?`);
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`;
+}
+
+function render(){
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  const cat = document.getElementById('categoryFilter').value;
+  const size = document.getElementById('sizeFilter').value;
+
+  const filtered = dresses.filter(d => {
+    const matchesQ = !q || d.name.toLowerCase().includes(q) || d.colour.toLowerCase().includes(q);
+    const matchesCat = !cat || d.category === cat;
+    const matchesSize = !size || d.sizes.includes(size);
+    return matchesQ && matchesCat && matchesSize;
+  });
+
+  document.getElementById('count').textContent = `${filtered.length} of ${dresses.length} dresses`;
+
+  const grid = document.getElementById('grid');
+  const empty = document.getElementById('empty');
+  grid.innerHTML = "";
+
+  if(filtered.length === 0){
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  filtered.forEach(d => {
+    const card = document.createElement('div');
+    card.className = "card";
+
+    const imgHTML = d.image
+      ? `<img src="${d.image}" alt="${d.name}">`
+      : `<div class="img-placeholder">Photo coming soon<br>— ${d.name} —</div>`;
+
+    card.innerHTML = `
+      <span class="tag ${d.available ? '' : 'unavailable'}">${d.available ? 'Available' : 'Currently Out'}</span>
+      <div class="img-wrap">${imgHTML}</div>
+      <div class="info">
+        <h3>${d.name}</h3>
+        <div class="meta">${d.category} · ${d.colour}</div>
+        <div class="sizes">Sizes: ${d.sizes.join(", ")}</div>
+        <div class="price">R${d.price} <span>/ rental</span></div>
+        <a class="reserve ${d.available ? '' : 'disabled'}" href="${d.available ? waLink(d.name) : '#'}" target="_blank" rel="noopener">
+          ${d.available ? 'Reserve on WhatsApp' : 'Unavailable'}
+        </a>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+
+/* ---- Loading screen: tracks real progress of dress photos ---- */
+(function initLoader(){
+  const loader = document.getElementById('loader');
+  const barFill = document.getElementById('loaderBarFill');
+  const status = document.getElementById('loaderStatus');
+  const MIN_DISPLAY_MS = 1100; // keeps the screen from flashing if images load instantly
+  const startTime = Date.now();
+
+  const imagesToLoad = dresses.filter(d => d.image);
+  const total = imagesToLoad.length;
+  let loaded = 0;
+
+  function updateProgress(){
+    const pct = total === 0 ? 100 : Math.round((loaded / total) * 100);
+    barFill.style.width = pct + "%";
+    status.textContent = total === 0
+      ? "Almost there…"
+      : `Loading dresses… ${loaded}/${total}`;
+  }
+
+  function finish(){
+    const elapsed = Date.now() - startTime;
+    const wait = Math.max(0, MIN_DISPLAY_MS - elapsed);
+    status.textContent = "Welcome";
+    setTimeout(() => loader.classList.add('hidden'), wait);
+  }
+
+  if (total === 0){
+    updateProgress();
+    finish();
+    return;
+  }
+
+  updateProgress();
+  imagesToLoad.forEach(d => {
+    const img = new Image();
+    img.onload = img.onerror = () => {
+      loaded++;
+      updateProgress();
+      if (loaded === total) finish();
+    };
+    img.src = d.image;
+  });
+
+  // Safety net: never let the loader hang forever if an image stalls
+  setTimeout(finish, 6000);
+})();
+
+populateFilters();
+render();
+</script>
+</body>
+</html>
